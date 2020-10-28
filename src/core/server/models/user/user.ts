@@ -1,5 +1,4 @@
 import bcrypt from "bcryptjs";
-import { uniq } from "lodash";
 import { DateTime, DurationObject } from "luxon";
 import { Db, MongoError } from "mongodb";
 import { v4 as uuid } from "uuid";
@@ -1748,6 +1747,9 @@ export async function siteBanUser(
       $push: {
         "status.ban.history": banHistory,
       },
+      $addToSet: {
+        "status.ban.siteIDs": { $each: siteIDs },
+      },
     },
     {
       // False to return the updated document instead of the original
@@ -1871,6 +1873,9 @@ export async function removeUserSiteBan(
       $push: {
         "status.ban.history": ban,
       },
+      $pull: {
+        "status.ban.siteIDs": { $in: siteIDs },
+      },
     },
     {
       // False to return the updated document instead of the original
@@ -1941,6 +1946,7 @@ export async function removeUserBan(
     {
       $set: {
         "status.ban.active": false,
+        "status.ban.siteIDs": [],
       },
       $push: {
         "status.ban.history": ban,
@@ -2338,61 +2344,14 @@ const computeBanActive = (ban: BanStatus, siteID?: string) => {
   return !!ban.siteIDs?.includes(siteID);
 };
 
-export function computeBanSiteIDs(ban: BanStatus, now: Date = new Date()) {
-  if (!ban.history || ban.history.length === 0) {
-    return [];
-  }
-
-  const bannedSiteIDs = new Array<string>();
-  ban.history.forEach((history: BanStatusHistory) => {
-    if (
-      !history.active ||
-      !history.siteIDs ||
-      history.siteIDs.length === 0 ||
-      history.createdAt > now
-    ) {
-      return;
-    }
-
-    const includesAll = (superSet: any[], subSet: any[]) => {
-      for (const value of subSet) {
-        if (!superSet.includes(value)) {
-          return false;
-        }
-      }
-
-      return true;
-    };
-
-    const banRemoval = ban.history.find(
-      (h) =>
-        h.active === false &&
-        h.createdAt > history.createdAt &&
-        // Check if it was a full on ban removal
-        (!h.siteIDs ||
-          h.siteIDs.length === 0 ||
-          // Check if it was a removal of specifically this site ban
-          (h.siteIDs &&
-            includesAll(h.siteIDs, history.siteIDs ? history.siteIDs : [])))
-    );
-
-    if (!banRemoval) {
-      bannedSiteIDs.push(...history.siteIDs);
-    }
-  });
-
-  return uniq(bannedSiteIDs);
-}
-
 export function consolidateUserBanStatus(
   ban: User["status"]["ban"],
-  now: Date = new Date(),
   siteID?: string
 ) {
   return {
     ...ban,
+    siteIDs: ban.siteIDs ? ban.siteIDs : [],
     active: computeBanActive(ban, siteID),
-    siteIDs: computeBanSiteIDs(ban, now),
   };
 }
 
@@ -2462,7 +2421,7 @@ export function consolidateUserStatus(
 ): ConsolidatedUserStatus {
   return {
     suspension: consolidateUserSuspensionStatus(status.suspension, now),
-    ban: consolidateUserBanStatus(status.ban, now, siteID),
+    ban: consolidateUserBanStatus(status.ban, siteID),
     premod: consolidateUserPremodStatus(status.premod),
     warning: consolidateUserWarningStatus(status.warning),
   };
