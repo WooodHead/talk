@@ -16,6 +16,7 @@ import {
   GQLUSER_AUTH_CONDITIONS,
   GQLUSER_ROLE,
   GQLUSER_STATUS,
+  GQLUSER_STATUS_FILTER,
 } from "./__generated__/types";
 
 import { RelayEnumLiteral } from "../types";
@@ -26,6 +27,9 @@ export type GQLMODERATION_QUEUE_RL = RelayEnumLiteral<
 export type GQLUSER_ROLE_RL = RelayEnumLiteral<typeof GQLUSER_ROLE>;
 export type GQLTAG_RL = RelayEnumLiteral<typeof GQLTAG>;
 export type GQLUSER_STATUS_RL = RelayEnumLiteral<typeof GQLUSER_STATUS>;
+export type GQLUSER_STATUS_FILTER_RL = RelayEnumLiteral<
+  typeof GQLUSER_STATUS_FILTER
+>;
 export type GQLCOMMENT_FLAG_DETECTED_REASON_RL = RelayEnumLiteral<
   typeof GQLCOMMENT_FLAG_DETECTED_REASON
 >;
