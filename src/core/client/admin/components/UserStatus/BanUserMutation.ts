@@ -73,6 +73,7 @@ const BanUserMutation = createMutation(
                     },
                   },
                 ],
+                sites: [],
               },
             },
           },
