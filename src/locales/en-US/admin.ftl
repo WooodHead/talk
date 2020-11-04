@@ -1107,6 +1107,7 @@ community-userStatus-removeBan = Remove Ban
 community-userStatus-removeUserBan = Remove ban
 community-userStatus-suspendUser = Suspend User
 community-userStatus-suspend = Suspend
+community-userStatus-suspendEverywhere = Suspend everywhere
 community-userStatus-removeSuspension = Remove Suspension
 community-userStatus-removeUserSuspension = Remove suspension
 community-userStatus-unknown = Unknown
@@ -1203,6 +1204,7 @@ community-warnModal-message-description = Explain to this user how they should c
 community-warnModal-cancel = Cancel
 community-warnModal-warnUser = Warn user
 community-userStatus-warn = Warn
+community-userStatus-warnEverywhere = Warn everywhere
 
 ## Stories
 stories-emptyMessage = There are currently no published stories.
