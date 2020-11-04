@@ -61,6 +61,10 @@ const BanUserMutation = createMutation(
                 status: {
                   ban: {
                     active: true,
+                    sites:
+                      input.siteIDs?.map((id) => {
+                        return { id };
+                      }) || [],
                   },
                 },
               },
